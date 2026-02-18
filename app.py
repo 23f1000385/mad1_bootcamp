@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, session
 from flask_sqlalchemy import SQLAlchemy 
+from datetime import datetime
 
 
 app = Flask(__name__)
@@ -14,7 +15,7 @@ class Sponsor(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(100), nullable=False)
     password = db.Column(db.String(100), unique=True, nullable=False)
-
+    status = db.Column(db.Boolean, default=True, nullable=False)
     campaigns = db.relationship('Campaign', lazy=True, backref='sponsor', cascade="all, delete-orphan")
 
 class Campaign(db.Model):
@@ -22,7 +23,8 @@ class Campaign(db.Model):
     name = db.Column(db.String(100), nullable=False)
     niche = db.Column(db.String(100))
     sponsor_id = db.Column(db.Integer, db.ForeignKey('sponsor.id'), nullable=False)
-
+    start_date = db.Column(db.Date)
+    end_date = db.Column(db.Date)
 
 with app.app_context():
     db.create_all()
@@ -67,15 +69,21 @@ def sponsordashboard():
     id = session['user_id']
     sponsor = Sponsor.query.filter_by(id=id).first()
     username = sponsor.name
-    return render_template('sponsordashboard.html', sponsor_name=username)
+    campaigns = Campaign.query.filter_by(sponsor_id=id).all()
+    return render_template('sponsordashboard.html', sponsor_name=username, campaigns=campaigns)
 
 @app.route('/create_campaign', methods=['POST'])
 def create_campaign():
     if request.method == 'POST':
         name = request.form.get('campaign_name')
         niche = request.form.get('niche')
+        start_date = request.form.get('start_date')
+        end_date = request.form.get('end_date')
+        start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
+        end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
+        print("hiiiii", start_date, end_date, type(start_date))
         sponsor_id = session['user_id']
-        campaign = Campaign(name=name, niche=niche, sponsor_id=sponsor_id)
+        campaign = Campaign(name=name, niche=niche, sponsor_id=sponsor_id, start_date=start_date, end_date=end_date)
         db.session.add(campaign)
         db.session.commit()
         return redirect('/sponsordashboard')
