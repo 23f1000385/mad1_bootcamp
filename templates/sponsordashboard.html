@@ -26,13 +26,14 @@
         <div class="modal-body">
                 <form action="/create_campaign" method="post">
                 <div class="form-group">
-                    <label for="exampleInputEmail1">Email address</label>
-                    <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
-                    <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+                    <label for="campaign_name">Campaign Name</label>
+                    <input type="text" class="form-control" placeholder="Name">
                 </div>
                 
-                <input type="text" name="campaign_name" placeholder="Campaign name">
-                <input type="text" name="niche" placeholder="niche">
+                <div class="form-group">
+                    <label for="niche">Niche</label>
+                    <input type="text" class="form-control" placeholder="Niche">
+                </div>
                 
         </div>
         <div class="modal-footer">
